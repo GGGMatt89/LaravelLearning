@@ -24,11 +24,13 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'admin' => false
         ];
     }
 
@@ -41,4 +43,15 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the model's admin field is set to true.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'admin' => true,
+        ]);
+    }//App\Models\User::factory()->admin()->create() -> this uses the state "admin" to create an admin user
+
 }
