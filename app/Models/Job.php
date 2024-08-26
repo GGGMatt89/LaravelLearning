@@ -24,7 +24,9 @@ class Job extends Model {
 //        return $job;
 //    }
     protected $table = "job_listings";
-    protected $fillable = ['title', 'salary'];
+    protected $fillable = ['title', 'salary', 'employer_id'];
+
+//    protected $guarded = []; setting to empty will disable the mass assignment check for all fields - opposite of $fillable array
 
     public function employer()
     {

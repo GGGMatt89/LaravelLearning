@@ -8,11 +8,16 @@ Route::get('/', function () {
     return view('home');
 });
 Route::get('/jobs', function () {
-    $jobs = Job::with('employer')->get(); //EAGER LOADING, to avoid N+1 query problem (if I request the employer with $job->employer once the job has been already retrieved with a db query, it is lazy loaded
+    $jobs = Job::with('employer')->latest()->simplePaginate(3); //EAGER LOADING, to avoid N+1 query problem (if I request the employer with $job->employer once the job has been already retrieved with a db query, it is lazy loaded
     //a new query is performed - if we already now that the employer is needed, it must be eager loaded so that the query is only one
-    return view('jobs', [
+    //plus adding pagination
+    return view('jobs.index', [
         'jobs' => $jobs
     ]);
+});
+
+Route::get('jobs/create', function () {
+    return view('jobs.create');
 });
 
 Route::get('/jobs/{id}', function ($id) {
@@ -22,7 +27,17 @@ Route::get('/jobs/{id}', function ($id) {
 //equivalent to
     $job = Arr::find($id);
 
-    return view('job', ['job' => $job]);
+    return view('jobs.show', ['job' => $job]);
+});
+
+Route::post('/jobs', function(){
+    Job::create([
+        'title' => request('title'),
+        "salary" => request('salary'),
+        'employer_id' => '1'
+    ]);
+
+    return redirect('/jobs');
 });
 
 Route::get('/contact', function () {

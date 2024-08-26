@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-       // Model::preventLazyLoading();//to disable lazy loading of relations
+        Model::preventLazyLoading();//to disable lazy loading of relations
+
+//        Paginator::useBootstrapFive(); to configure which css engine to be used to display the pagination links
     }
 }

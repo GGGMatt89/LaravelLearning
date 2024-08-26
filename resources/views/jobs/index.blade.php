@@ -9,5 +9,9 @@
                 </div>
             </a>
         @endforeach
+        <div>
+            {{ $jobs->links() }}
+            <!-- pagination links are formatted with preformatted defaults from different css engines => to customize it, publish the vendor assets (php artisan vendor:publish) and modify the blade file in resources/views/vendor/pagination/xxxxxx.blade.php with xxxx converted to the selected css engine-->
+        </div>
     </div>
     </x-layout>
