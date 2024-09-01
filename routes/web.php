@@ -1,7 +1,24 @@
 <?php
 
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\SessionController;
+use App\Models\Job;
 use Illuminate\Support\Facades\Route;
+
+
+Route::get('/test', function(){
+
+//    dispatch(function(){
+//        logger("Hello from the queue");
+//    })->delay(5);
+
+    $job = Job::first();
+
+    \App\Jobs\TranslateJob::dispatch($job);
+
+    return "Done";
+});
 
 //Route::get('/', function () {
 //    return view('home');
@@ -113,16 +130,18 @@ Route::view('/', 'home');
 //    Route::patch('/jobs/{job}','update');
 //    Route::delete('/jobs/{job}','destroy');
 //});
-//Route::get('/jobs', [JobController::class, 'index']);
-//Route::get('/jobs/create', [JobController::class,'create']);
-//Route::get('/jobs/{job}', [JobController::class,'show']);
-//Route::post('/jobs', [JobController::class,'store']);
-//Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
-//Route::patch('/jobs/{job}', [JobController::class, 'update']);
-//Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+Route::get('/jobs', [JobController::class, 'index']);
+Route::get('/jobs/create', [JobController::class,'create'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class,'show']);
+Route::post('/jobs', [JobController::class,'store']);
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware('auth')->can('edit', 'job');//We are here the JobPolicy because we are referring to a Job model, with the method edit
+    //->can('edit-job','job'); //we use the gate 'edit-job' with the 'can' middleware and we pass the wildcard job which refers to the {job} in the url - IMPLICIT MODEL BINDING
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
 
 //use resource to register default routes for all CRUD functions
-Route::resource('jobs', JobController::class); //
+//with this approach anyway, a middleware is applied the same way to all routes -> sometimes more convenient to stick with the single-route declaration approach
+//Route::resource('jobs', JobController::class)->middleware('auth'); //the middleware, in case not authenticated, redirect to a route with "name"->"login" - it is needed to give such name to the login route
 //if we want to use a selected bunch of default routes for CRUD functions
 //Route::resource('jobs', JobController::class, ['except' => ['show']]); //except show']);
 //Route::resource('jobs', JobController::class, ['only' => ['show']]); //only show']);
@@ -132,3 +151,13 @@ Route::resource('jobs', JobController::class); //
 //    return view('contact');
 //}); =>
 Route::view('/contact', 'contact');
+
+
+//Auth
+Route::get('/register', [RegisteredUserController::class, 'create']);
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store']);
+Route::post('/logout', [SessionController::class, 'destroy']);
+

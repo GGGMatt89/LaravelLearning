@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\JobPosted;
 use App\Models\Job;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 
 class JobController extends Controller
 {
@@ -34,17 +39,35 @@ class JobController extends Controller
             'salary' => ['required']
         ]);
 
-        Job::create([
+        $job = Job::create([
             'title' => request('title'),
             'salary' => request('salary'),
             'employer_id' => '1'
         ]);
+
+       Mail::to($job->employer->user)->queue(
+            new JobPosted($job)
+        );
 
         return redirect('/jobs');
     }
 
     public function edit(Job $job)
     {
+        //Gate::define('edit-job', function(User $user, Job $job){
+        //    return $job->employer->user->is($user);
+        //});
+        //definition moved to AppServicProvider boot method, so the Gate is available for every request
+        //if(Auth::guest())
+        //{
+         //   return redirect('/login');
+        //}-> already handled by the Gate
+
+        //Gate::authorize('edit-job', $job);
+        //Auth::user()->can('edit-job', $job);//equivalent to Gate above
+        //all defined with middleware at the Route level
+
+
         return view('jobs.edit', ['job' => $job]);
     }
 
